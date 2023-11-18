@@ -5,12 +5,15 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { loginFormSchema, loginFormPropsT } from "../types/config";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  resetPasswordFormPropsT,
+  resetPasswordFormSchema,
+} from "../types/config";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/firebase/client";
-import { setCookie } from "cookies-next";
+import { toast } from "react-toastify";
 
-function Login() {
+function ResetPassword() {
   const router = useRouter();
   const [requesting, setRequesting] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -18,26 +21,27 @@ function Login() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
-  } = useForm<loginFormPropsT>({
-    resolver: zodResolver(loginFormSchema),
+  } = useForm<resetPasswordFormPropsT>({
+    resolver: zodResolver(resetPasswordFormSchema),
   });
 
-  const onSubmit: SubmitHandler<loginFormPropsT> = async ({
+  const onSubmit: SubmitHandler<resetPasswordFormPropsT> = async ({
     email,
-    password,
   }) => {
     setRequesting(true);
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user: any = userCredential.user;
-        if (user) {
-          setCookie("accessToken", user.accessToken, { maxAge: 604800 });
-          router.push("/");
-        }
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        setValue("email", "");
+        toast.success(
+          "Um e-mail foi enviado. Verifique sua caixa de entrada ou lixo eletrônico"
+        );
       })
       .catch((error) => {
         console.log(error.message);
+      })
+      .finally(() => {
         setRequesting(false);
       });
   };
@@ -45,7 +49,7 @@ function Login() {
   return (
     <section className="flex flex-col justify-center items-center h-screen px-4">
       <div className="bg-white text-black p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-semibold mb-4">Login</h2>
+        <h2 className="text-2xl font-semibold mb-4">Resetar senha</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label htmlFor="email" className="block font-medium">
@@ -64,24 +68,6 @@ function Login() {
             </span>
           </div>
 
-          <div className="mb-4">
-            <label htmlFor="password" className="block font-medium">
-              Senha
-            </label>
-            <input
-              type="password"
-              id="password"
-              className={`mt-1 p-2 w-full border  rounded-md ${
-                errors.password ? "border-red-500" : "border-gray-400"
-              }`}
-              {...register("password")}
-            />
-
-            <span className="text-red-500 text-sm">
-              {errors.password?.message}
-            </span>
-          </div>
-
           <>
             <button
               type="submit"
@@ -91,7 +77,7 @@ function Login() {
               {requesting ? (
                 <AiOutlineLoading3Quarters className="animate-spin" />
               ) : (
-                "Entrar"
+                "Enviar"
               )}
             </button>
             <span className="text-red-500 text-sm">{error}</span>
@@ -100,16 +86,16 @@ function Login() {
 
         <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
           <Link
-            href="signup"
+            href="/login"
             className="w-fit text-blue-600 hover:text-blue-800"
           >
-            Cadastre-se
+            Login
           </Link>
           <Link
-            href="resetPassword"
+            href="/signup"
             className="sm:text-right w-fit sm:ml-auto text-blue-600 hover:text-blue-800"
           >
-            Esqueci a senha
+            Cadastre-se
           </Link>
         </div>
       </div>
@@ -117,4 +103,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ResetPassword;

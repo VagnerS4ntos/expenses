@@ -36,6 +36,13 @@ export const signupFormSchema = z
 
 export type signupFormProps = z.infer<typeof signupFormSchema>;
 
+/********************* SIGNUP FORM *************************/
+export const resetPasswordFormSchema = z.object({
+  email: z.string().email({ message: "Email inválido" }),
+});
+
+export type resetPasswordFormPropsT = z.infer<typeof resetPasswordFormSchema>;
+
 /********************* EXPENSE FORM *************************/
 export const expenseFormSchema = z.object({
   name: z.string().min(3, {

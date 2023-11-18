@@ -48,8 +48,8 @@ function SignUp() {
   };
 
   return (
-    <main className="flex justify-center items-center h-screen px-4">
-      <section className="bg-white text-black p-8 rounded-lg shadow-md w-96">
+    <section className="flex justify-center items-center h-screen px-4">
+      <div className="bg-white text-black p-8 rounded-lg shadow-md w-96">
         <h2 className="text-2xl font-semibold mb-4">Cadastro</h2>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -127,8 +127,8 @@ function SignUp() {
             Já tem conta? Login
           </Link>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
   );
 }
 
