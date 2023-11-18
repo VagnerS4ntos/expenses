@@ -83,49 +83,51 @@ function ExpensesTable() {
   return (
     <>
       {slicedExpenses.length > 0 ? (
-        <table className="border table-auto w-full mt-4">
-          <thead>
-            <tr className="bg-gray-200 text-black uppercase text-sm">
-              <th className={`px-4 py-2 `}>Nome</th>
-              <th className={`px-4 py-2 `}>Valor</th>
-              <th className={`px-4 py-2 `}>Data</th>
-              <th className={`px-4 py-2 `}>Ações</th>
-            </tr>
-          </thead>
-          <tbody className="text-white">
-            {slicedExpenses.map(({ id, name, value, date, type }) => (
-              <tr key={id} className={`border`} data-id={id}>
-                <td className={`px-4 py-2 text-center border relative`}>
-                  {name}
-                </td>
-                <td
-                  className={`px-4 py-2 text-center border font-bold ${
-                    type == "saída" ? "text-red-600" : "text-green-600"
-                  }`}
-                >
-                  {convertNumberToCurrency(value)}
-                </td>
-                <td className={`px-4 py-2 text-center border`}>
-                  {convertDate(date)}
-                </td>
-                <td className={`px-4 py-2 text-center border`}>
-                  <span className="flex justify-center items-center gap-2 sm:gap-5 lg:gap-8">
-                    <MdDelete
-                      size="1.5em"
-                      className="text-red-600 cursor-pointer"
-                      onClick={deletingExpense}
-                    />
-                    <MdEdit
-                      size="1.5em"
-                      className="text-purple-600 cursor-pointer"
-                      onClick={editingExpense}
-                    />
-                  </span>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="border table-auto w-full mt-4">
+            <thead>
+              <tr className="bg-gray-200 text-black uppercase text-sm">
+                <th className={`px-4 py-2 `}>Nome</th>
+                <th className={`px-4 py-2 `}>Valor</th>
+                <th className={`px-4 py-2 `}>Data</th>
+                <th className={`px-4 py-2 `}>Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="text-white">
+              {slicedExpenses.map(({ id, name, value, date, type }) => (
+                <tr key={id} className={`border`} data-id={id}>
+                  <td className={`px-4 py-2 text-center border relative`}>
+                    {name}
+                  </td>
+                  <td
+                    className={`px-4 py-2 text-center border font-bold ${
+                      type == "saída" ? "text-red-600" : "text-green-600"
+                    }`}
+                  >
+                    {convertNumberToCurrency(value)}
+                  </td>
+                  <td className={`px-4 py-2 text-center border`}>
+                    {convertDate(date)}
+                  </td>
+                  <td className={`px-4 py-2 text-center border`}>
+                    <span className="flex justify-center items-center gap-2 sm:gap-5 lg:gap-8">
+                      <MdDelete
+                        size="1.5em"
+                        className="text-red-600 cursor-pointer"
+                        onClick={deletingExpense}
+                      />
+                      <MdEdit
+                        size="1.5em"
+                        className="text-purple-600 cursor-pointer"
+                        onClick={editingExpense}
+                      />
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <p className="mt-4">Nenhum dado encontrado</p>
       )}
