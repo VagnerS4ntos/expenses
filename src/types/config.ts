@@ -97,3 +97,40 @@ const expenseSchema = z.object({
 });
 
 export type expenseStateT = z.infer<typeof expenseSchema>;
+
+/********************* SETTINGS  *************************/
+export const updateNameFormSchema = z.object({
+  name: z.string().min(3, {
+    message: "Seu nome precisa ter pelo menos 3 caracteres",
+  }),
+});
+
+export type updateNameFormPropsT = z.infer<typeof updateNameFormSchema>;
+
+export const updateEmailFormSchema = z.object({
+  email: z.string().email({ message: "Email inválido" }),
+});
+
+export type updateEmailFormPropsT = z.infer<typeof updateEmailFormSchema>;
+
+export const updatePasswordFormSchema = z
+  .object({
+    password: z
+      .string()
+      .min(6, { message: "A senha precisa ter pelo menos 6 caracteres" }),
+    password2: z.string(),
+  })
+  .refine((data) => data.password == data.password2, {
+    path: ["password2"],
+    message: "As senhas precisam ser iguais",
+  });
+
+export type updatePasswordFormPropsT = z.infer<typeof updatePasswordFormSchema>;
+
+/********************* HANDLE ORDER BY *************************/
+const orderSchema = z.object({
+  orderBy: z.enum(["name", "value", "date"]),
+  getOrderBy: z.function().args(z.enum(["name", "value", "date"])),
+});
+
+export type orderByT = z.infer<typeof orderSchema>;

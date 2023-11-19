@@ -5,7 +5,7 @@ import {
   expenseDataT,
   expenseFormProps,
   expenseFormSchema,
-} from "@/app/types/config";
+} from "@/types/config";
 import { useExpenses } from "@/states/config";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/client";

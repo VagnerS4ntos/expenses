@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "react-toastify";
-import { signupFormProps, signupFormSchema } from "../types/config";
+import { signupFormProps, signupFormSchema } from "../../types/config";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { setCookie } from "cookies-next";
@@ -60,6 +60,7 @@ function SignUp() {
             <input
               type="text"
               id="name"
+              placeholder="Nome"
               className="mt-1 p-2 w-full border border-gray-400 rounded-md"
               {...register("name")}
             />
@@ -72,6 +73,7 @@ function SignUp() {
             <input
               type="text"
               id="email"
+              placeholder="E-mail"
               className="mt-1 p-2 w-full border border-gray-400 rounded-md"
               {...register("email")}
             />
@@ -87,6 +89,7 @@ function SignUp() {
             <input
               type="password"
               id="password"
+              placeholder="Senha"
               className="mt-1 p-2 w-full border border-gray-400 rounded-md"
               {...register("password")}
             />
@@ -102,6 +105,7 @@ function SignUp() {
             <input
               type="password"
               id="password2"
+              placeholder="Senha"
               className="mt-1 p-2 w-full border border-gray-400 rounded-md"
               {...register("password2")}
             />

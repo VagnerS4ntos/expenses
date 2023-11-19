@@ -5,7 +5,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { loginFormSchema, loginFormPropsT } from "../types/config";
+import { loginFormSchema, loginFormPropsT } from "@/types/config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { setCookie } from "cookies-next";
@@ -37,7 +37,14 @@ function Login() {
         }
       })
       .catch((error) => {
-        console.log(error.message);
+        if (
+          error.message == "Firebase: Error (auth/wrong-password)." ||
+          error.message == "Firebase: Error (auth/user-not-found)."
+        ) {
+          setError("E-mail ou senha incorreta");
+        } else {
+          setError(error.message);
+        }
         setRequesting(false);
       });
   };
@@ -54,6 +61,7 @@ function Login() {
             <input
               type="text"
               id="email"
+              placeholder="E-mail"
               className={`mt-1 p-2 w-full border  rounded-md ${
                 errors.email ? "border-red-500" : "border-gray-400"
               }`}
@@ -71,6 +79,7 @@ function Login() {
             <input
               type="password"
               id="password"
+              placeholder="Senha"
               className={`mt-1 p-2 w-full border  rounded-md ${
                 errors.password ? "border-red-500" : "border-gray-400"
               }`}

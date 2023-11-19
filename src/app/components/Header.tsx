@@ -40,7 +40,9 @@ function Header() {
             <span className="text-xl">{user.displayName}</span>
           </li>
           <li className="cursor-pointer hover:text-white">
-            <RiUserSettingsFill />
+            <Link href="/settings">
+              <RiUserSettingsFill />
+            </Link>
           </li>
           <li className="cursor-pointer hover:text-white" onClick={logOut}>
             <VscSignOut />

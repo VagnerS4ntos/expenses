@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { expenseFormProps, expenseFormSchema } from "@/app/types/config";
+import { expenseFormProps, expenseFormSchema } from "@/types/config";
 import { useExpenses, useUser } from "@/states/config";
 import { getInputDateFormat } from "../../../utils/helpers";
 import { addDoc, collection } from "firebase/firestore";

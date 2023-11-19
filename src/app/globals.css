@@ -7,6 +7,10 @@ body {
   color: white;
 }
 
+.react-tabs__tab--selected::after {
+  display: none;
+}
+
 .paginationContainer {
   display: flex;
   justify-content: center;

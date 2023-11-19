@@ -1,6 +1,6 @@
 import { db } from "@/firebase/client";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { expenseDataT } from "../app/types/config";
+import { expenseDataT } from "../types/config";
 
 export const ROUTE_PROTECTED_REGEX = /\/(?!.)|\/settings(?!.)/i;
 
@@ -64,6 +64,8 @@ export async function getAllExpensesDatabase(user_id: string) {
     expenses.map(
       (item: any) => (item.date = new Date(item.date.seconds * 1000))
     );
+
+    expenses.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 
     return expenses;
   } catch (error) {

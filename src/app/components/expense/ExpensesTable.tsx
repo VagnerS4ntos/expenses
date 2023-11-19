@@ -1,5 +1,10 @@
 import React from "react";
-import { useExpenses, useSelectDate, useUser } from "@/states/config";
+import {
+  useExpenses,
+  useOrderBy,
+  useSelectDate,
+  useUser,
+} from "@/states/config";
 import { MdDelete, MdEdit } from "react-icons/md";
 import {
   convertNumberToCurrency,
@@ -8,10 +13,11 @@ import {
   convertDate,
 } from "@/utils/helpers";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { expenseDataT } from "@/app/types/config";
+import { expenseDataT } from "@/types/config";
 import Paginate from "../Paginate";
 import DeleteExpense from "./DeleteExpense";
 import EditExpense from "./EditingExpense";
+import OrderBy from "./OrderBy";
 
 function ExpensesTable() {
   const {
@@ -24,6 +30,7 @@ function ExpensesTable() {
     editing,
     setEditing,
   } = useExpenses((state) => state);
+  const { orderBy } = useOrderBy((state) => state);
   const [loading, setLoading] = React.useState(true);
   const { user } = useUser((state) => state);
   const { month, year } = useSelectDate((state) => state);
@@ -32,6 +39,7 @@ function ExpensesTable() {
     []
   );
 
+  //Dados da paginação
   const [currentPage, setCurrentPage] = React.useState(1);
   const expensesPerPege = 10;
   const lastIndex = currentPage * expensesPerPege;
@@ -40,6 +48,7 @@ function ExpensesTable() {
     []
   );
 
+  //Paga todas as despesas do usuário
   React.useEffect(() => {
     if (user.uid) {
       getAllExpensesDatabase(user.uid)
@@ -50,23 +59,31 @@ function ExpensesTable() {
     }
   }, [user]);
 
+  //Pega as despesas por dada e também divide para a paginação
   React.useEffect(() => {
     const expenseRenderData = getExpensesDatabaseByDate(
       expensesData,
       year,
       month
     );
+
+    expenseRenderData.sort((a, b) =>
+      a[orderBy] < b[orderBy] ? -1 : a[orderBy] > b[orderBy] ? 1 : 0
+    );
+
     const slicedExpensesData = expenseRenderData.slice(firstIndex, lastIndex);
     setSlicedExpenses(slicedExpensesData);
     getExpensesByDate(expenseRenderData);
-  }, [month, year, expensesData, currentPage]);
+  }, [month, year, expensesData, currentPage, orderBy]);
 
+  //Abre a janela para deletar despesa
   function deletingExpense(event: any) {
     const { id } = event.target.closest("[data-id]").dataset;
     setDeleteExpenseId(id);
     setDeleting(true);
   }
 
+  //Abre a janela para editar despesa
   function editingExpense(event: any) {
     const { id } = event.target.closest("[data-id]").dataset;
     const data = expensesByDate.filter((expense) => expense.id == id);
@@ -83,7 +100,8 @@ function ExpensesTable() {
   return (
     <>
       {slicedExpenses.length > 0 ? (
-        <div className="overflow-x-auto">
+        <section className="overflow-x-auto">
+          <OrderBy />
           <table className="border table-auto w-full mt-4">
             <thead>
               <tr className="bg-gray-200 text-black uppercase text-sm">
@@ -118,7 +136,7 @@ function ExpensesTable() {
                       />
                       <MdEdit
                         size="1.5em"
-                        className="text-purple-600 cursor-pointer"
+                        className="text-blue-600 cursor-pointer"
                         onClick={editingExpense}
                       />
                     </span>
@@ -127,7 +145,7 @@ function ExpensesTable() {
               ))}
             </tbody>
           </table>
-        </div>
+        </section>
       ) : (
         <p className="mt-4">Nenhum dado encontrado</p>
       )}

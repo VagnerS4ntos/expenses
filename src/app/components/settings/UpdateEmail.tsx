@@ -1,45 +1,43 @@
 "use client";
 import React from "react";
-import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import {
-  resetPasswordFormPropsT,
-  resetPasswordFormSchema,
-} from "../../types/config";
-import { sendPasswordResetEmail } from "firebase/auth";
+import { updateEmailFormPropsT, updateEmailFormSchema } from "@/types/config";
+import { updateEmail } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { toast } from "react-toastify";
+import Reauthenticate from "./Reauthenticate";
 
-function ResetPassword() {
-  const router = useRouter();
+function UpdateEmail() {
   const [requesting, setRequesting] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [reauthenticateRequired, setReauthenticateRequired] =
+    React.useState(false);
 
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<resetPasswordFormPropsT>({
-    resolver: zodResolver(resetPasswordFormSchema),
+  } = useForm<updateEmailFormPropsT>({
+    resolver: zodResolver(updateEmailFormSchema),
   });
 
-  const onSubmit: SubmitHandler<resetPasswordFormPropsT> = async ({
-    email,
-  }) => {
+  const onSubmit: SubmitHandler<updateEmailFormPropsT> = async ({ email }) => {
     setRequesting(true);
-    sendPasswordResetEmail(auth, email)
+    updateEmail(auth.currentUser!, email)
       .then(() => {
         setValue("email", "");
-        toast.success(
-          "Um e-mail foi enviado. Verifique sua caixa de entrada ou lixo eletrônico"
-        );
+        toast.success("E-mail atualizado com sucesso!");
       })
       .catch((error) => {
-        setError(error.message);
+        if (error.message == "Firebase: Error (auth/requires-recent-login).") {
+          setReauthenticateRequired(true);
+          toast.info("Você precisa se reautenticar antes");
+        } else {
+          setError(error.message);
+        }
       })
       .finally(() => {
         setRequesting(false);
@@ -47,9 +45,10 @@ function ResetPassword() {
   };
 
   return (
-    <section className="flex flex-col justify-center items-center h-screen px-4">
-      <div className="bg-white text-black p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-semibold mb-4">Resetar senha</h2>
+    <section className="max-w-lg">
+      {reauthenticateRequired ? (
+        <Reauthenticate setReauthenticateRequired={setReauthenticateRequired} />
+      ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label htmlFor="email" className="block font-medium">
@@ -59,7 +58,7 @@ function ResetPassword() {
               type="text"
               id="email"
               placeholder="E-mail"
-              className={`mt-1 p-2 w-full border  rounded-md ${
+              className={`mt-1 p-2 w-full border  rounded-md text-black ${
                 errors.email ? "border-red-500" : "border-gray-400"
               }`}
               {...register("email")}
@@ -78,30 +77,15 @@ function ResetPassword() {
               {requesting ? (
                 <AiOutlineLoading3Quarters className="animate-spin" />
               ) : (
-                "Enviar"
+                "Atualizar"
               )}
             </button>
             <span className="text-red-500 text-sm">{error}</span>
           </>
         </form>
-
-        <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <Link
-            href="/login"
-            className="w-fit text-blue-600 hover:text-blue-800"
-          >
-            Login
-          </Link>
-          <Link
-            href="/signup"
-            className="sm:text-right w-fit sm:ml-auto text-blue-600 hover:text-blue-800"
-          >
-            Cadastre-se
-          </Link>
-        </div>
-      </div>
+      )}
     </section>
   );
 }
 
-export default ResetPassword;
+export default UpdateEmail;
