@@ -19,6 +19,6 @@ const config = {
   credential: admin.credential.cert(credentials as ServiceAccount),
 };
 
-export const firebase = admin.apps.length
-  ? admin.app()
-  : admin.initializeApp(config);
+const firebase = admin.apps.length ? admin.app() : admin.initializeApp(config);
+
+export { firebase };

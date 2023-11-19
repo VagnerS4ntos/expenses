@@ -9,6 +9,7 @@ import { loginFormSchema, loginFormPropsT } from "@/types/config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { setCookie } from "cookies-next";
+import GoogleLogin from "../components/login/GoogleLogin";
 
 function Login() {
   const router = useRouter();
@@ -50,7 +51,7 @@ function Login() {
   };
 
   return (
-    <section className="flex flex-col justify-center items-center h-screen px-4">
+    <section className="flex justify-center items-center h-screen px-4">
       <div className="bg-white text-black p-8 rounded-lg shadow-md w-96">
         <h2 className="text-2xl font-semibold mb-4">Login</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -106,6 +107,8 @@ function Login() {
             <span className="text-red-500 text-sm">{error}</span>
           </>
         </form>
+
+        <GoogleLogin />
 
         <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
           <Link
