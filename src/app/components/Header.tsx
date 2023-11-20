@@ -6,8 +6,8 @@ import { RiUserSettingsFill } from "react-icons/ri";
 import { signOut } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { useRouter } from "next/navigation";
-import { deleteCookie } from "cookies-next";
 import { useSelectDate, useUser } from "@/states/config";
+import { toast } from "react-toastify";
 
 function Header() {
   const router = useRouter();
@@ -16,15 +16,23 @@ function Header() {
 
   function logOut() {
     signOut(auth)
-      .then(() => {
-        deleteCookie("accessToken");
-        deleteCookie("uid");
-        getYear(new Date().getFullYear());
-        getMonth(new Date().getMonth());
-        router.push("/login");
+      .then(async () => {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/signout`,
+          {
+            method: "POST",
+          }
+        );
+
+        if (response.status === 200) {
+          getYear(new Date().getFullYear());
+          getMonth(new Date().getMonth());
+          router.push("/login");
+        }
       })
       .catch((error) => {
         console.log(error);
+        toast.error("Algo deu errado");
       });
   }
 

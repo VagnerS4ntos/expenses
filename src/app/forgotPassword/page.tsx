@@ -3,7 +3,6 @@ import React from "react";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import {
   resetPasswordFormPropsT,
@@ -13,8 +12,7 @@ import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { toast } from "react-toastify";
 
-function ResetPassword() {
-  const router = useRouter();
+function ForgotPassword() {
   const [requesting, setRequesting] = React.useState(false);
   const [error, setError] = React.useState("");
 
@@ -104,4 +102,4 @@ function ResetPassword() {
   );
 }
 
-export default ResetPassword;
+export default ForgotPassword;

@@ -1,14 +1,7 @@
 import React from "react";
-import {
-  useExpenses,
-  useOrderBy,
-  useSelectDate,
-  useUser,
-} from "@/states/config";
-import { MdDelete, MdEdit } from "react-icons/md";
+import { useExpenses, useOrderBy, useSelectDate } from "@/states/config";
 import {
   convertNumberToCurrency,
-  getAllExpensesDatabase,
   getExpensesDatabaseByDate,
   convertDate,
 } from "@/utils/helpers";
@@ -23,17 +16,15 @@ import { Reorder } from "framer-motion";
 function ExpensesTable() {
   const {
     expensesData,
-    getExpensesData,
     getExpensesByDate,
     expensesByDate,
     setDeleting,
     deleting,
     editing,
     setEditing,
+    fetchingExpenses,
   } = useExpenses((state) => state);
   const { orderBy } = useOrderBy((state) => state);
-  const [loading, setLoading] = React.useState(true);
-  const { user } = useUser((state) => state);
   const { month, year } = useSelectDate((state) => state);
   const [deleteExpenseId, setDeleteExpenseId] = React.useState("");
   const [editExpenseData, setEditExpenseData] = React.useState<expenseDataT[]>(
@@ -48,17 +39,6 @@ function ExpensesTable() {
   const [slicedExpenses, setSlicedExpenses] = React.useState<expenseDataT[]>(
     []
   );
-
-  //Paga todas as despesas do usuário
-  React.useEffect(() => {
-    if (user.uid) {
-      getAllExpensesDatabase(user.uid)
-        .then((data) => {
-          getExpensesData(data);
-        })
-        .then(() => setLoading(false));
-    }
-  }, [user]);
 
   //Pega as despesas por dada e também divide para a paginação
   React.useEffect(() => {
@@ -93,9 +73,9 @@ function ExpensesTable() {
     setEditing(true);
   }
 
-  if (loading)
+  if (fetchingExpenses)
     return (
-      <AiOutlineLoading3Quarters size="2em" className="animate-spin mt-10 " />
+      <AiOutlineLoading3Quarters size="2em" className="animate-spin mt-5" />
     );
 
   return (

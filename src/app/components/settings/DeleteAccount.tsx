@@ -3,8 +3,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaExclamationTriangle } from "react-icons/fa";
 import Reauthenticate from "./Reauthenticate";
 import { deleteUser } from "firebase/auth";
-import { auth } from "firebase-admin";
-import { useUser } from "@/states/config";
+import { useSelectDate, useUser } from "@/states/config";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { deleteCookie } from "cookies-next";
@@ -12,6 +11,7 @@ import { deleteCookie } from "cookies-next";
 function DeleteAccount() {
   const router = useRouter();
   const { user } = useUser((state) => state);
+  const { getMonth, getYear } = useSelectDate((state) => state);
   const [requesting, setRequesting] = React.useState(false);
   const [reauthenticateRequired, setReauthenticateRequired] =
     React.useState(false);
@@ -25,10 +25,20 @@ function DeleteAccount() {
 
   function deleteAccount() {
     deleteUser(user)
-      .then(() => {
-        toast.success("Sua conta foi deletada com sucesso!");
-        deleteCookie("accessToken");
-        router.push("/login");
+      .then(async () => {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/signout`,
+          {
+            method: "POST",
+          }
+        );
+
+        if (response.status === 200) {
+          toast.success("Sua conta foi deletada com sucesso!");
+          getYear(new Date().getFullYear());
+          getMonth(new Date().getMonth());
+          router.push("/login");
+        }
       })
       .catch((error) => {
         if (error.message == "Firebase: Error (auth/requires-recent-login).") {
@@ -37,6 +47,7 @@ function DeleteAccount() {
           setRequesting(false);
         } else {
           setError(error.message);
+          toast.error("Algo deu errado");
         }
       });
   }

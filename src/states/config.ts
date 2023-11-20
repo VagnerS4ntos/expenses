@@ -16,6 +16,8 @@ export const useExpenses = create<expenseStateT>((set) => ({
   setDeleting: (data) => set({ deleting: data }),
   editing: false,
   setEditing: (data) => set({ editing: data }),
+  fetchingExpenses: true,
+  setFetchingExpenses: (data) => set({ fetchingExpenses: data }),
   expensesData: [],
   getExpensesData: (data) => set({ expensesData: data }),
   expensesByDate: [],

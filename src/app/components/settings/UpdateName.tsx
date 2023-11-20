@@ -45,7 +45,7 @@ function UpdateName() {
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-lg">
       <div className="mb-4">
         <label htmlFor="name" className="block font-medium">
-          Nome
+          Novo nome
         </label>
         <input
           type="text"

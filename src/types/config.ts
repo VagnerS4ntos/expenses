@@ -90,6 +90,8 @@ const expenseSchema = z.object({
   setDeleting: z.function().args(z.boolean()),
   editing: z.boolean(),
   setEditing: z.function().args(z.boolean()),
+  fetchingExpenses: z.boolean(),
+  setFetchingExpenses: z.function().args(z.boolean()),
   expensesData: z.array(expensesDataSchema),
   getExpensesData: z.function().args(z.array(expensesDataSchema)),
   expensesByDate: z.array(expensesDataSchema),

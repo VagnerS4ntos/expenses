@@ -10,11 +10,11 @@ import {
 import { updatePassword } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import Reauthenticate from "./Reauthenticate";
+import { useUser } from "@/states/config";
 
 function UpdatePassword() {
-  const router = useRouter();
+  const { user } = useUser((state) => state);
   const [requesting, setRequesting] = React.useState(false);
   const [error, setError] = React.useState("");
   const [reauthenticateRequired, setReauthenticateRequired] =
@@ -39,6 +39,17 @@ function UpdatePassword() {
         setValue("password2", "");
         toast.success("Senha atualizado com sucesso!");
       })
+      .then(async () => {
+        const idToken = await user.getIdToken();
+
+        //Chamei a função de login porque o Firebase revoga o cookie de sessão quando a senha do usuário é alterada
+        fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/login`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
+      })
       .catch((error) => {
         if (error.message == "Firebase: Error (auth/requires-recent-login).") {
           setReauthenticateRequired(true);
@@ -60,7 +71,7 @@ function UpdatePassword() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label htmlFor="password" className="block font-medium">
-              Senha
+              Nova senha
             </label>
             <input
               type="password"
@@ -78,7 +89,7 @@ function UpdatePassword() {
 
           <div className="mb-4">
             <label htmlFor="password2" className="block font-medium">
-              Repita a senha
+              Repita a nova senha
             </label>
             <input
               type="password"

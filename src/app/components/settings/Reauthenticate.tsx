@@ -40,8 +40,16 @@ function Reauthenticate({
         if (error.message == "Firebase: Error (auth/user-mismatch).") {
           setError("Senha ou e-mail incorreto");
         } else {
-          console.log(error.message);
+          if (
+            error.message == "Firebase: Error (auth/wrong-password)." ||
+            error.message == "Firebase: Error (auth/user-not-found)."
+          ) {
+            setError("E-mail ou senha incorreta");
+          } else {
+            setError(error.message);
+          }
         }
+        setRequesting(false);
       });
   };
 

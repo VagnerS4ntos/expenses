@@ -8,7 +8,6 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { loginFormSchema, loginFormPropsT } from "@/types/config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/client";
-import { setCookie } from "cookies-next";
 import GoogleLogin from "../components/login/GoogleLogin";
 
 function Login() {
@@ -29,13 +28,21 @@ function Login() {
     password,
   }) => {
     setRequesting(true);
+
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user: any = userCredential.user;
-        if (user) {
-          setCookie("accessToken", user.accessToken, { maxAge: 604800 });
-          router.push("/");
-        }
+      .then(async ({ user }) => {
+        const idToken = await user.getIdToken();
+
+        fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/login`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }).then((response) => {
+          if (response.status === 200) {
+            router.push("/");
+          }
+        });
       })
       .catch((error) => {
         if (
@@ -112,13 +119,13 @@ function Login() {
 
         <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
           <Link
-            href="signup"
+            href="/signup"
             className="w-fit text-blue-600 hover:text-blue-800"
           >
             Cadastre-se
           </Link>
           <Link
-            href="resetPassword"
+            href="/forgotPassword"
             className="sm:text-right w-fit sm:ml-auto text-blue-600 hover:text-blue-800"
           >
             Esqueci a senha

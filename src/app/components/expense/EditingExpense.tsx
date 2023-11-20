@@ -49,6 +49,7 @@ function EditExpense({ editExpenseData }: { editExpenseData: expenseDataT[] }) {
       toast.success("Despesa atualizada com sucesso");
       setEditing(false);
     } catch (error) {
+      toast.error("Algo deu errado");
       console.log(error);
     }
   };

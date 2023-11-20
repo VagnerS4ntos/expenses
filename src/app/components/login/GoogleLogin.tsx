@@ -4,8 +4,6 @@ import { FcGoogle } from "react-icons/fc";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { setCookie } from "cookies-next";
-
 import { auth } from "@/firebase/client";
 
 function GoogleLogin() {
@@ -17,11 +15,21 @@ function GoogleLogin() {
 
   function login() {
     setRequesting(true);
+
     signInWithPopup(auth, provider)
-      .then((result) => {
-        const user: any = result.user;
-        setCookie("accessToken", user.accessToken, { maxAge: 604800 });
-        router.push("/");
+      .then(async ({ user }) => {
+        const idToken = await user.getIdToken();
+
+        fetch("/api/login", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }).then((response) => {
+          if (response.status === 200) {
+            router.push("/");
+          }
+        });
       })
       .catch((error) => {
         setError(error.message);

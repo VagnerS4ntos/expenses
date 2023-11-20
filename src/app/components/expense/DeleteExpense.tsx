@@ -19,6 +19,7 @@ function DeleteExpense({ id }: { id: string }) {
       toast.success("Despesa deletada com sucesso!");
       setDeleting(false);
     } catch (error) {
+      toast.error("Algo deu errado");
       console.log(error);
     }
   }

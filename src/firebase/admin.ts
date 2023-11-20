@@ -1,6 +1,8 @@
 import admin from "firebase-admin";
 import { ServiceAccount } from "firebase-admin/app";
 
+import { initializeApp, getApps } from "firebase-admin/app";
+
 const credentials = {
   type: process.env.FIREBASE_TYPE!,
   project_id: process.env.FIREBASE_PROJECT_ID!,
@@ -19,6 +21,8 @@ const config = {
   credential: admin.credential.cert(credentials as ServiceAccount),
 };
 
-const firebase = admin.apps.length ? admin.app() : admin.initializeApp(config);
-
-export { firebase };
+export function customInitApp() {
+  if (getApps().length <= 0) {
+    initializeApp(config);
+  }
+}

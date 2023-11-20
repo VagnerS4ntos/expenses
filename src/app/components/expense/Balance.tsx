@@ -1,5 +1,5 @@
 import React from "react";
-import { convertNumberToCurrency } from "../../../utils/helpers";
+import { convertNumberToCurrency } from "@/utils/helpers";
 import { GrMoney } from "react-icons/gr";
 import { useExpenses } from "@/states/config";
 

@@ -52,7 +52,7 @@ function UpdateEmail() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label htmlFor="email" className="block font-medium">
-              E-mail
+              Novo e-mail
             </label>
             <input
               type="text"

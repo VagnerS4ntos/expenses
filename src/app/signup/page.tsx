@@ -32,13 +32,21 @@ function SignUp() {
     setRequesting(true);
 
     createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user: any = userCredential.user;
-        setCookie("accessToken", user.accessToken, { maxAge: 604800 });
-        updateProfile(user, {
-          displayName: name,
-        }).then(() => {
-          router.push("/");
+      .then(async ({ user }) => {
+        const idToken = await user.getIdToken();
+        fetch("/api/login", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }).then((response) => {
+          if (response.status === 200) {
+            updateProfile(user, {
+              displayName: name,
+            }).then(() => {
+              router.push("/");
+            });
+          }
         });
       })
       .catch((error) => {

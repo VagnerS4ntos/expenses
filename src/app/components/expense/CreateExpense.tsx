@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { expenseFormProps, expenseFormSchema } from "@/types/config";
 import { useExpenses, useUser } from "@/states/config";
-import { getInputDateFormat } from "../../../utils/helpers";
+import { getInputDateFormat } from "@/utils/helpers";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "@/firebase/client";
 import { toast } from "react-toastify";
@@ -41,6 +41,7 @@ function CreateExpense() {
       toast.success("Despesa criada com sucesso");
       setCreating(false);
     } catch (error) {
+      toast.error("Algo deu errado");
       console.log(error);
     }
   };

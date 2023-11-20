@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { years, months } from "../../../utils/helpers";
+import { years, months } from "@/utils/helpers";
 import { useSelectDate } from "@/states/config";
 
 function SelectDate() {

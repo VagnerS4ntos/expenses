@@ -1,48 +1,48 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { cookies } from "next/headers";
 
 const ROUTE_PROTECTED_REGEX = /\/(?!.)|\/settings(?!.)/i;
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+export async function middleware(request: NextRequest, response: NextResponse) {
+  const { pathname } = request.nextUrl;
+  const session = request.cookies.get("session");
 
-  const token = cookies().get("accessToken");
-  if (token) {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/auth`,
+  if (session) {
+    const responseAPI = await fetch(
+      `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/login`,
       {
-        method: "POST",
         headers: {
-          Authorization: `Bearer ${token.value}`,
+          Cookie: `session=${session?.value}`,
         },
       }
     );
 
-    const { status } = await response.json();
+    if (responseAPI.status == 200 && !ROUTE_PROTECTED_REGEX.test(pathname)) {
+      return NextResponse.redirect(new URL("/", request.url));
+    } else if (
+      responseAPI.status == 200 &&
+      ROUTE_PROTECTED_REGEX.test(pathname)
+    ) {
+      return NextResponse.next();
+    }
 
-    if (status == 200) {
-      if (ROUTE_PROTECTED_REGEX.test(pathname)) {
-        return NextResponse.next();
-      } else {
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-    } else {
-      if (ROUTE_PROTECTED_REGEX.test(pathname)) {
-        return NextResponse.redirect(new URL("/login", req.url));
-      } else {
-        return NextResponse.next();
-      }
+    if (responseAPI.status == 401 && !ROUTE_PROTECTED_REGEX.test(pathname)) {
+      return NextResponse.next();
+    } else if (
+      responseAPI.status == 401 &&
+      ROUTE_PROTECTED_REGEX.test(pathname)
+    ) {
+      return NextResponse.redirect(new URL("/login", request.url));
     }
   } else {
     if (ROUTE_PROTECTED_REGEX.test(pathname)) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    } else {
+      return NextResponse.redirect(new URL("/login", request.url));
+    } else if (!ROUTE_PROTECTED_REGEX.test(pathname)) {
       return NextResponse.next();
     }
   }
 }
 
 export const config = {
-  matcher: ["/", "/login", "/signup", "/settings"],
+  matcher: ["/", "/login", "/signup", "/settings", "/forgotPassword"],
 };
