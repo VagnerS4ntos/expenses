@@ -81,64 +81,69 @@ function ExpensesTable() {
   return (
     <>
       {slicedExpenses.length > 0 ? (
-        <section className="overflow-x-auto">
+        <>
           <OrderBy />
-          <Reorder.Group values={slicedExpenses} onReorder={setSlicedExpenses}>
-            <table className="border table-auto w-full mt-4">
-              <thead>
-                <tr className="bg-gray-200 text-black uppercase text-sm">
-                  <th className={`px-4 py-2 `}>Nome</th>
-                  <th className={`px-4 py-2 `}>Valor</th>
-                  <th className={`px-4 py-2 `}>Data</th>
-                  <th className={`px-4 py-2 `}>Ações</th>
-                </tr>
-              </thead>
-              <tbody className="text-white">
-                <>
-                  {slicedExpenses.map(({ id, name, value, date, type }) => (
-                    <Reorder.Item
-                      as="tr"
-                      key={id}
-                      data-id={id}
-                      value={slicedExpenses}
-                      drag={false}
-                    >
-                      <td className={`px-4 py-2 text-center border relative`}>
-                        {name}
-                      </td>
-                      <td
-                        className={`px-4 py-2 text-center border font-bold ${
-                          type == "saída" ? "text-red-600" : "text-green-600"
-                        }`}
+          <section className="overflow-x-auto">
+            <Reorder.Group
+              values={slicedExpenses}
+              onReorder={setSlicedExpenses}
+            >
+              <table className="border table-auto w-full mt-4">
+                <thead>
+                  <tr className="bg-gray-200 text-black uppercase text-sm">
+                    <th className={`px-4 py-2 `}>Nome</th>
+                    <th className={`px-4 py-2 `}>Valor</th>
+                    <th className={`px-4 py-2 `}>Data</th>
+                    <th className={`px-4 py-2 `}>Ações</th>
+                  </tr>
+                </thead>
+                <tbody className="text-white">
+                  <>
+                    {slicedExpenses.map(({ id, name, value, date, type }) => (
+                      <Reorder.Item
+                        as="tr"
+                        key={id}
+                        data-id={id}
+                        value={slicedExpenses}
+                        drag={false}
                       >
-                        {convertNumberToCurrency(value)}
-                      </td>
-                      <td className={`px-4 py-2 text-center border`}>
-                        {convertDate(date)}
-                      </td>
-                      <td className={`px-4 py-2 text-center border`}>
-                        <div className="flex justify-center items-center gap-2 sm:gap-5 lg:gap-8">
-                          <span
-                            className="cursor-pointer"
-                            onClick={deletingExpense}
-                          >
-                            🗑️
-                          </span>
-                          <span
-                            className="cursor-pointer"
-                            onClick={editingExpense}
-                          >
-                            ✏️
-                          </span>
-                        </div>
-                      </td>
-                    </Reorder.Item>
-                  ))}
-                </>
-              </tbody>
-            </table>
-          </Reorder.Group>
-        </section>
+                        <td className={`px-4 py-2 text-center border relative`}>
+                          {name}
+                        </td>
+                        <td
+                          className={`px-4 py-2 text-center border font-bold ${
+                            type == "saída" ? "text-red-600" : "text-green-600"
+                          }`}
+                        >
+                          {convertNumberToCurrency(value)}
+                        </td>
+                        <td className={`px-4 py-2 text-center border`}>
+                          {convertDate(date)}
+                        </td>
+                        <td className={`px-4 py-2 text-center border`}>
+                          <div className="flex justify-center items-center gap-2 sm:gap-5 lg:gap-8">
+                            <span
+                              className="cursor-pointer"
+                              onClick={deletingExpense}
+                            >
+                              🗑️
+                            </span>
+                            <span
+                              className="cursor-pointer"
+                              onClick={editingExpense}
+                            >
+                              ✏️
+                            </span>
+                          </div>
+                        </td>
+                      </Reorder.Item>
+                    ))}
+                  </>
+                </tbody>
+              </table>
+            </Reorder.Group>
+          </section>
+        </>
       ) : (
         <p className="mt-4">Nenhum dado encontrado</p>
       )}

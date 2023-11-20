@@ -7,14 +7,17 @@ function Balance() {
   const [showBalance, setShowBalance] = React.useState(false);
   const { expensesByDate } = useExpenses((state) => state);
 
+  //Soma dos valores que entraram
   const inflows = expensesByDate
     .filter((expense) => expense.type == "entrada")
     .reduce((acc, value) => acc + value.value, 0);
 
+  //Soma dos valores que saíram
   const expenses = expensesByDate
     .filter((expense) => expense.type == "saída")
     .reduce((acc, value) => acc + value.value, 0);
 
+  //Cálculo do saldo
   const balance = inflows - expenses;
 
   return (

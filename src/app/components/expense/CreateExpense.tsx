@@ -28,8 +28,10 @@ function CreateExpense() {
     date,
   }) => {
     try {
+      //Formata a data para adicionar ao Firebase
       const [year, month, day] = date.split("-");
       const dataObj = new Date(+year, +month - 1, +day);
+
       const expensesCollection = collection(db, "allExpenses");
       await addDoc(expensesCollection, {
         name,
@@ -46,6 +48,7 @@ function CreateExpense() {
     }
   };
 
+  //Fecha a janela de criação de despesa
   function closeCreateExpense(event: any) {
     if (event.target.dataset.close) {
       setCreating(false);

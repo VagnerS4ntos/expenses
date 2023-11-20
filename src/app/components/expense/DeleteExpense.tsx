@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 function DeleteExpense({ id }: { id: string }) {
   const { setDeleting } = useExpenses((state) => state);
 
+  //Fecha a janela para excluir uma despesa
   function closeDeletingExpense(event: any) {
     if (event.target.dataset.close) {
       setDeleting(false);

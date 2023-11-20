@@ -9,7 +9,6 @@ import { toast } from "react-toastify";
 import { signupFormProps, signupFormSchema } from "../../types/config";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/firebase/client";
-import { setCookie } from "cookies-next";
 
 function SignUp() {
   const router = useRouter();
@@ -18,7 +17,6 @@ function SignUp() {
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors },
   } = useForm<signupFormProps>({
     resolver: zodResolver(signupFormSchema),
@@ -51,6 +49,7 @@ function SignUp() {
       })
       .catch((error) => {
         console.log(error.message);
+        toast.error("Algo deu errado");
         setRequesting(false);
       });
   };

@@ -15,12 +15,19 @@ function DeleteAccount() {
   const [requesting, setRequesting] = React.useState(false);
   const [reauthenticateRequired, setReauthenticateRequired] =
     React.useState(false);
+
   const [error, setError] = React.useState("");
 
   function closeDeletingAccount(event: any) {
     if (event.target.dataset.close) {
       setRequesting(false);
+      setReauthenticateRequired(false);
     }
+  }
+
+  function requestDeleteAccount() {
+    setRequesting(true);
+    setReauthenticateRequired(true);
   }
 
   function deleteAccount() {
@@ -54,22 +61,18 @@ function DeleteAccount() {
 
   return (
     <section className="max-w-lg mt-4">
-      {reauthenticateRequired ? (
-        <Reauthenticate setReauthenticateRequired={setReauthenticateRequired} />
-      ) : (
-        <button
-          type="submit"
-          className="w-full bg-red-600 hover:bg-red-500 text-white p-2 rounded-md flex items-center justify-center h-10 mb-10"
-          disabled={requesting}
-          onClick={() => setRequesting(true)}
-        >
-          {requesting ? (
-            <AiOutlineLoading3Quarters className="animate-spin" />
-          ) : (
-            "Deletar minha conta"
-          )}
-        </button>
-      )}
+      <button
+        type="submit"
+        className="w-full bg-red-600 hover:bg-red-500 text-white p-2 rounded-md flex items-center justify-center h-10 mb-10"
+        disabled={requesting}
+        onClick={requestDeleteAccount}
+      >
+        {requesting ? (
+          <AiOutlineLoading3Quarters className="animate-spin" />
+        ) : (
+          "Deletar minha conta"
+        )}
+      </button>
 
       {requesting && (
         <section
@@ -80,22 +83,33 @@ function DeleteAccount() {
           <div className="bg-zinc-900 p-6 rounded-md max-w-sm w-1/2 min-w-max">
             <FaExclamationTriangle className="text-red-600 text-2xl" />
             <p className="mb-2 text-2xl">DELETAR CONTA</p>
-            <p>Tem certeza disso?</p>
-            <p>Isso não poderá ser desfeito</p>
-            <div className="mt-4 flex gap-4">
-              <button
-                className="bg-red-600 hover:bg-red-500 px-2 py-1 rounded-md grow"
-                onClick={deleteAccount}
-              >
-                SIM
-              </button>
-              <button
-                className="bg-green-600 hover:bg-green-500 px-2 py-1 rounded-md grow"
-                data-close={true}
-              >
-                NÃO
-              </button>
-            </div>
+            {reauthenticateRequired && (
+              <Reauthenticate
+                setReauthenticateRequired={setReauthenticateRequired}
+              />
+            )}
+
+            {requesting && !reauthenticateRequired && (
+              <>
+                <p>Tem certeza disso?</p>
+                <p>Isso não poderá ser desfeito</p>
+                <div className="mt-4 flex gap-4">
+                  <button
+                    className="bg-red-600 hover:bg-red-500 px-2 py-1 rounded-md grow"
+                    onClick={deleteAccount}
+                  >
+                    SIM
+                  </button>
+                  <button
+                    className="bg-green-600 hover:bg-green-500 px-2 py-1 rounded-md grow"
+                    data-close={true}
+                  >
+                    NÃO
+                  </button>
+                </div>
+              </>
+            )}
+
             <span className="text-red-500 text-sm">{error}</span>
           </div>
         </section>
