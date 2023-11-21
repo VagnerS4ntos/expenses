@@ -1,11 +1,12 @@
 import React from "react";
-import { useExpenses } from "@/states/config";
+import { useExpenses, useUser } from "@/states/config";
 import { db } from "@/firebase/client";
 import { doc, deleteDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 
 function DeleteExpense({ id }: { id: string }) {
   const { setDeleting } = useExpenses((state) => state);
+  const { user } = useUser((state) => state);
 
   //Fecha a janela para excluir uma despesa
   function closeDeletingExpense(event: any) {
@@ -16,7 +17,8 @@ function DeleteExpense({ id }: { id: string }) {
 
   async function deleteExpense() {
     try {
-      await deleteDoc(doc(db, "allExpenses", id));
+      const user_id = user.uid;
+      await deleteDoc(doc(db, user_id, id));
       toast.success("Despesa deletada com sucesso!");
       setDeleting(false);
     } catch (error) {

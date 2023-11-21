@@ -1,5 +1,5 @@
 import { db } from "@/firebase/client";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { expenseDataT } from "../types/config";
 
 export const ROUTE_PROTECTED_REGEX = /\/(?!.)|\/settings(?!.)/i;
@@ -49,12 +49,9 @@ export function getInputDateFormat(date?: any) {
 //Pega todas as despesas do usuário
 export async function getAllExpensesDatabase(user_id: string) {
   try {
-    const querySnapshot = query(
-      collection(db, "allExpenses"),
-      where("user", "==", user_id)
-    );
+    const expensesRef = collection(db, user_id);
 
-    const data = await getDocs(querySnapshot);
+    const data = await getDocs(expensesRef);
 
     const expenses = data.docs.map((doc) => ({
       ...doc.data(),

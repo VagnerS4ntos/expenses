@@ -28,16 +28,16 @@ function CreateExpense() {
     date,
   }) => {
     try {
+      const user_id = user.uid;
       //Formata a data para adicionar ao Firebase
       const [year, month, day] = date.split("-");
       const dataObj = new Date(+year, +month - 1, +day);
 
-      const expensesCollection = collection(db, "allExpenses");
+      const expensesCollection = collection(db, user_id);
       await addDoc(expensesCollection, {
         name,
         type,
         value: Number(value),
-        user: user.uid,
         date: dataObj,
       });
       toast.success("Despesa criada com sucesso");
@@ -72,6 +72,7 @@ function CreateExpense() {
         <input
           type="text"
           id="name"
+          autoFocus
           className={`mt-1 p-2 w-full border  rounded-md text-black ${
             errors.name && "border-red-600"
           }`}

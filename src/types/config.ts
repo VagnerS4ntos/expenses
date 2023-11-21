@@ -78,7 +78,6 @@ const expensesDataSchema = z.object({
   value: z.number(),
   type: z.enum(["entrada", "saída"]),
   date: z.string(),
-  user: z.string(),
 });
 
 export type expenseDataT = z.infer<typeof expensesDataSchema>;

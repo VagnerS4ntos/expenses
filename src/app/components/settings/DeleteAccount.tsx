@@ -3,20 +3,23 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaExclamationTriangle } from "react-icons/fa";
 import Reauthenticate from "./Reauthenticate";
 import { deleteUser } from "firebase/auth";
-import { useSelectDate, useUser } from "@/states/config";
+import { useExpenses, useSelectDate, useUser } from "@/states/config";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { deleteCookie } from "cookies-next";
+import { deleteDoc, doc } from "firebase/firestore";
+import { db } from "@/firebase/client";
 
 function DeleteAccount() {
   const router = useRouter();
   const { user } = useUser((state) => state);
+  const { expensesData } = useExpenses((state) => state);
   const { getMonth, getYear } = useSelectDate((state) => state);
   const [requesting, setRequesting] = React.useState(false);
   const [reauthenticateRequired, setReauthenticateRequired] =
     React.useState(false);
 
   const [error, setError] = React.useState("");
+  const [removingAccount, setRemovingAccount] = React.useState(false);
 
   function closeDeletingAccount(event: any) {
     if (event.target.dataset.close) {
@@ -30,9 +33,16 @@ function DeleteAccount() {
     setReauthenticateRequired(true);
   }
 
-  function deleteAccount() {
-    deleteUser(user)
-      .then(async () => {
+  async function deleteAccount() {
+    setRemovingAccount(true);
+    try {
+      await Promise.all(
+        expensesData.map(async (item) => {
+          await deleteDoc(doc(db, user.uid, item.id));
+        })
+      );
+
+      deleteUser(user).then(async () => {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/signout`,
           {
@@ -46,17 +56,12 @@ function DeleteAccount() {
           getMonth(new Date().getMonth());
           router.push("/login");
         }
-      })
-      .catch((error) => {
-        if (error.message == "Firebase: Error (auth/requires-recent-login).") {
-          setReauthenticateRequired(true);
-          toast.info("Você precisa se reautenticar antes");
-          setRequesting(false);
-        } else {
-          setError(error.message);
-          toast.error("Algo deu errado");
-        }
       });
+    } catch (error: any) {
+      setError(error.message || error);
+      toast.error("Algo deu errado");
+      setRemovingAccount(false);
+    }
   }
 
   return (
@@ -91,22 +96,34 @@ function DeleteAccount() {
 
             {requesting && !reauthenticateRequired && (
               <>
-                <p>Tem certeza disso?</p>
-                <p>Isso não poderá ser desfeito</p>
-                <div className="mt-4 flex gap-4">
-                  <button
-                    className="bg-red-600 hover:bg-red-500 px-2 py-1 rounded-md grow"
-                    onClick={deleteAccount}
-                  >
-                    SIM
-                  </button>
-                  <button
-                    className="bg-green-600 hover:bg-green-500 px-2 py-1 rounded-md grow"
-                    data-close={true}
-                  >
-                    NÃO
-                  </button>
-                </div>
+                {removingAccount ? (
+                  <div className="m-4">
+                    <div className="dot-falling" />
+                  </div>
+                ) : (
+                  <>
+                    <p>Tem certeza disso?</p>
+                    <p>Isso não poderá ser desfeito</p>
+                    <div className="mt-4 flex gap-4">
+                      <>
+                        <button
+                          className="bg-red-600 hover:bg-red-500 px-2 py-1 rounded-md grow"
+                          onClick={deleteAccount}
+                          disabled={removingAccount}
+                        >
+                          SIM
+                        </button>
+                        <button
+                          className="bg-green-600 hover:bg-green-500 px-2 py-1 rounded-md grow"
+                          data-close={true}
+                          disabled={removingAccount}
+                        >
+                          NÃO
+                        </button>
+                      </>
+                    </div>
+                  </>
+                )}
               </>
             )}
 

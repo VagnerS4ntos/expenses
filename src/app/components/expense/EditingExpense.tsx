@@ -6,7 +6,7 @@ import {
   expenseFormProps,
   expenseFormSchema,
 } from "@/types/config";
-import { useExpenses } from "@/states/config";
+import { useExpenses, useUser } from "@/states/config";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/client";
 import { toast } from "react-toastify";
@@ -14,6 +14,7 @@ import { getInputDateFormat } from "@/utils/helpers";
 
 function EditExpense({ editExpenseData }: { editExpenseData: expenseDataT[] }) {
   const { setEditing } = useExpenses((state) => state);
+  const { user } = useUser((state) => state);
 
   const {
     register,
@@ -36,10 +37,12 @@ function EditExpense({ editExpenseData }: { editExpenseData: expenseDataT[] }) {
     date,
   }) => {
     try {
+      const user_id = user.uid;
+
       const [year, month, day] = date.split("-");
       const dataObj = new Date(+year, +month - 1, +day);
 
-      await updateDoc(doc(db, "allExpenses", editExpenseData[0].id), {
+      await updateDoc(doc(db, user_id, editExpenseData[0].id), {
         name,
         type,
         value,
@@ -77,6 +80,7 @@ function EditExpense({ editExpenseData }: { editExpenseData: expenseDataT[] }) {
         <input
           type="text"
           id="name"
+          autoFocus
           className={`mt-1 p-2 w-full border  rounded-md text-black ${
             errors.name && "border-red-600"
           }`}

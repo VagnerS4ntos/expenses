@@ -28,7 +28,7 @@ function Provider({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     if (user.uid) {
-      const expensesRef = collection(db, "allExpenses");
+      const expensesRef = collection(db, user.uid);
       const observer = onSnapshot(expensesRef, (snapshot) => {
         getAllExpensesDatabase(user.uid).then((data) => {
           getExpensesData(data);
