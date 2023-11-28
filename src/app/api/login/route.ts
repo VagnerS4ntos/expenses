@@ -28,7 +28,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
     }
   }
 
-  return NextResponse.json({}, { status: 200 });
+  return NextResponse.json({ status: 200 });
 }
 
 export async function GET(request: NextRequest) {

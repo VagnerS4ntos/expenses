@@ -1,165 +1,170 @@
-import React from "react";
-import { useExpenses, useOrderBy, useSelectDate } from "@/states/config";
+import React from 'react';
+import { useExpenses, useOrderBy, useSelectDate } from '@/states/config';
 import {
-  convertNumberToCurrency,
-  getExpensesDatabaseByDate,
-  convertDate,
-} from "@/utils/helpers";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { expenseDataT } from "@/types/config";
-import Paginate from "../Paginate";
-import DeleteExpense from "./DeleteExpense";
-import EditExpense from "./EditingExpense";
-import OrderBy from "./OrderBy";
-import { Reorder } from "framer-motion";
+	convertNumberToCurrency,
+	getExpensesDatabaseByDate,
+	convertDate,
+} from '@/utils/helpers';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { expenseDataT } from '@/types/config';
+import Paginate from '../Paginate';
+import DeleteExpense from './DeleteExpense';
+import EditExpense from './EditingExpense';
+import OrderBy from './OrderBy';
+import { Reorder } from 'framer-motion';
 
 function ExpensesTable() {
-  const {
-    expensesData,
-    getExpensesByDate,
-    expensesByDate,
-    setDeleting,
-    deleting,
-    editing,
-    setEditing,
-    fetchingExpenses,
-  } = useExpenses((state) => state);
-  const { orderBy } = useOrderBy((state) => state);
-  const { month, year } = useSelectDate((state) => state);
-  const [deleteExpenseId, setDeleteExpenseId] = React.useState("");
-  const [editExpenseData, setEditExpenseData] = React.useState<expenseDataT[]>(
-    []
-  );
+	const {
+		expensesData,
+		getExpensesByDate,
+		expensesByDate,
+		setDeleting,
+		deleting,
+		editing,
+		setEditing,
+		fetchingExpenses,
+	} = useExpenses((state) => state);
+	const { orderBy } = useOrderBy((state) => state);
+	const { month, year } = useSelectDate((state) => state);
+	const [deleteExpenseId, setDeleteExpenseId] = React.useState('');
+	const [editExpenseData, setEditExpenseData] = React.useState<expenseDataT[]>(
+		[],
+	);
 
-  //Dados da paginação
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const expensesPerPege = 10;
-  const lastIndex = currentPage * expensesPerPege;
-  const firstIndex = lastIndex - expensesPerPege;
-  const [slicedExpenses, setSlicedExpenses] = React.useState<expenseDataT[]>(
-    []
-  );
+	//Dados da paginação
+	const [currentPage, setCurrentPage] = React.useState(1);
+	const expensesPerPege = 10;
+	const lastIndex = currentPage * expensesPerPege;
+	const firstIndex = lastIndex - expensesPerPege;
+	const [slicedExpenses, setSlicedExpenses] = React.useState<expenseDataT[]>(
+		[],
+	);
 
-  //Pega as despesas por dada e também divide para a paginação
-  React.useEffect(() => {
-    const expenseRenderData = getExpensesDatabaseByDate(
-      expensesData,
-      year,
-      month
-    );
+	//Pega as despesas por dada e também divide para a paginação
+	React.useEffect(() => {
+		const expenseRenderData = getExpensesDatabaseByDate(
+			expensesData,
+			year,
+			month,
+		);
 
-    expenseRenderData.sort((a, b) =>
-      a[orderBy] < b[orderBy] ? -1 : a[orderBy] > b[orderBy] ? 1 : 0
-    );
+		expenseRenderData.sort((a, b) =>
+			a[orderBy] < b[orderBy] ? -1 : a[orderBy] > b[orderBy] ? 1 : 0,
+		);
 
-    const slicedExpensesData = expenseRenderData.slice(firstIndex, lastIndex);
-    setSlicedExpenses(slicedExpensesData);
-    getExpensesByDate(expenseRenderData);
-  }, [month, year, expensesData, currentPage, orderBy]);
+		const slicedExpensesData = expenseRenderData.slice(firstIndex, lastIndex);
+		setSlicedExpenses(slicedExpensesData);
 
-  //Abre a janela para deletar despesa
-  function deletingExpense(event: any) {
-    const { id } = event.target.closest("[data-id]").dataset;
-    setDeleteExpenseId(id);
-    setDeleting(true);
-  }
+		if (slicedExpensesData.length % 10 == 0 && currentPage > 1) {
+			setCurrentPage((prev) => prev - 1);
+		}
 
-  //Abre a janela para editar despesa
-  function editingExpense(event: any) {
-    const { id } = event.target.closest("[data-id]").dataset;
-    const data = expensesByDate.filter((expense) => expense.id == id);
-    setEditExpenseData(data);
+		getExpensesByDate(expenseRenderData);
+	}, [month, year, expensesData, currentPage, orderBy]);
 
-    setEditing(true);
-  }
+	//Abre a janela para deletar despesa
+	function deletingExpense(event: any) {
+		const { id } = event.target.closest('[data-id]').dataset;
+		setDeleteExpenseId(id);
+		setDeleting(true);
+	}
 
-  if (fetchingExpenses)
-    return (
-      <AiOutlineLoading3Quarters size="2em" className="animate-spin mt-5" />
-    );
+	//Abre a janela para editar despesa
+	function editingExpense(event: any) {
+		const { id } = event.target.closest('[data-id]').dataset;
+		const data = expensesByDate.filter((expense) => expense.id == id);
+		setEditExpenseData(data);
 
-  return (
-    <>
-      {slicedExpenses.length > 0 ? (
-        <>
-          <OrderBy />
-          <section className="overflow-x-auto">
-            <Reorder.Group
-              values={slicedExpenses}
-              onReorder={setSlicedExpenses}
-            >
-              <table className="border table-auto w-full mt-4">
-                <thead>
-                  <tr className="bg-gray-200 text-black uppercase text-sm">
-                    <th className={`px-4 py-2 `}>Nome</th>
-                    <th className={`px-4 py-2 `}>Valor</th>
-                    <th className={`px-4 py-2 `}>Data</th>
-                    <th className={`px-4 py-2 `}>Ações</th>
-                  </tr>
-                </thead>
-                <tbody className="text-white">
-                  <>
-                    {slicedExpenses.map(({ id, name, value, date, type }) => (
-                      <Reorder.Item
-                        as="tr"
-                        key={id}
-                        data-id={id}
-                        value={slicedExpenses}
-                        drag={false}
-                      >
-                        <td className={`px-4 py-2 text-center border relative`}>
-                          {name}
-                        </td>
-                        <td
-                          className={`px-4 py-2 text-center border font-bold ${
-                            type == "saída" ? "text-red-600" : "text-green-600"
-                          }`}
-                        >
-                          {convertNumberToCurrency(value)}
-                        </td>
-                        <td className={`px-4 py-2 text-center border`}>
-                          {convertDate(date)}
-                        </td>
-                        <td className={`px-4 py-2 text-center border`}>
-                          <div className="flex justify-center items-center gap-2 sm:gap-5 lg:gap-8">
-                            <span
-                              className="cursor-pointer"
-                              onClick={deletingExpense}
-                            >
-                              🗑️
-                            </span>
-                            <span
-                              className="cursor-pointer"
-                              onClick={editingExpense}
-                            >
-                              ✏️
-                            </span>
-                          </div>
-                        </td>
-                      </Reorder.Item>
-                    ))}
-                  </>
-                </tbody>
-              </table>
-            </Reorder.Group>
-          </section>
-        </>
-      ) : (
-        <p className="mt-4">Nenhum dado encontrado</p>
-      )}
+		setEditing(true);
+	}
 
-      {expensesByDate.length > expensesPerPege && (
-        <Paginate
-          dataLength={expensesByDate.length}
-          dataPerPage={expensesPerPege}
-          setCurrentPage={setCurrentPage}
-        />
-      )}
+	if (fetchingExpenses)
+		return (
+			<AiOutlineLoading3Quarters size="2em" className="animate-spin mt-5" />
+		);
 
-      {deleting && <DeleteExpense id={deleteExpenseId} />}
-      {editing && <EditExpense editExpenseData={editExpenseData} />}
-    </>
-  );
+	return (
+		<>
+			{slicedExpenses.length > 0 ? (
+				<>
+					<OrderBy />
+					<section className="overflow-x-auto">
+						<Reorder.Group
+							values={slicedExpenses}
+							onReorder={setSlicedExpenses}
+						>
+							<table className="border table-auto w-full mt-4">
+								<thead>
+									<tr className="bg-gray-200 text-black uppercase text-sm">
+										<th className={`px-4 py-2 `}>Nome</th>
+										<th className={`px-4 py-2 `}>Valor</th>
+										<th className={`px-4 py-2 `}>Data</th>
+										<th className={`px-4 py-2 `}>Ações</th>
+									</tr>
+								</thead>
+								<tbody className="text-white">
+									<>
+										{slicedExpenses.map(({ id, name, value, date, type }) => (
+											<Reorder.Item
+												as="tr"
+												key={id}
+												data-id={id}
+												value={slicedExpenses}
+												drag={false}
+											>
+												<td className={`px-4 py-2 text-center border relative`}>
+													{name}
+												</td>
+												<td
+													className={`px-4 py-2 text-center border font-bold ${
+														type == 'saída' ? 'text-red-600' : 'text-green-600'
+													}`}
+												>
+													{convertNumberToCurrency(value)}
+												</td>
+												<td className={`px-4 py-2 text-center border`}>
+													{convertDate(date)}
+												</td>
+												<td className={`px-4 py-2 text-center border`}>
+													<div className="flex justify-center items-center gap-2 sm:gap-5 lg:gap-8">
+														<span
+															className="cursor-pointer"
+															onClick={deletingExpense}
+														>
+															🗑️
+														</span>
+														<span
+															className="cursor-pointer"
+															onClick={editingExpense}
+														>
+															✏️
+														</span>
+													</div>
+												</td>
+											</Reorder.Item>
+										))}
+									</>
+								</tbody>
+							</table>
+						</Reorder.Group>
+					</section>
+				</>
+			) : (
+				<p className="mt-4">Nenhum dado encontrado</p>
+			)}
+
+			{expensesByDate.length > expensesPerPege && (
+				<Paginate
+					dataLength={expensesByDate.length}
+					dataPerPage={expensesPerPege}
+					setCurrentPage={setCurrentPage}
+				/>
+			)}
+
+			{deleting && <DeleteExpense id={deleteExpenseId} />}
+			{editing && <EditExpense editExpenseData={editExpenseData} />}
+		</>
+	);
 }
 
 export default ExpensesTable;
