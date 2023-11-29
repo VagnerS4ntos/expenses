@@ -10,7 +10,8 @@ import { useExpenses, useUser } from '@/states/config';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebase/client';
 import { toast } from 'react-toastify';
-import { getInputDateFormat } from '@/utils/helpers';
+import { convertDateToFirestore, getInputDateFormat } from '@/utils/helpers';
+import _ from 'lodash';
 
 function EditExpense({ editExpenseData }: { editExpenseData: expenseDataT[] }) {
 	const { setEditing } = useExpenses((state) => state);
@@ -23,7 +24,7 @@ function EditExpense({ editExpenseData }: { editExpenseData: expenseDataT[] }) {
 	} = useForm<expenseFormProps>({
 		defaultValues: {
 			name: editExpenseData[0].name,
-			value: editExpenseData[0].value,
+			value: editExpenseData[0].value.toString(),
 			type: editExpenseData[0].type,
 			date: getInputDateFormat(editExpenseData[0].date),
 		},
@@ -37,17 +38,26 @@ function EditExpense({ editExpenseData }: { editExpenseData: expenseDataT[] }) {
 		date,
 	}) => {
 		try {
-			const user_id = user.uid;
+			const updateData = {
+				name,
+				value,
+				type,
+				date: convertDateToFirestore(date),
+				id: editExpenseData[0].id,
+			};
+			if (_.isEqual(editExpenseData[0], updateData)) {
+				toast.success('Despesa atualizada com sucesso');
+				setEditing(false);
+				return;
+			}
 
-			//Formata a data para adicionar ao Firebase
-			const [year, month, day] = date.split('-');
-			const dataObj = new Date(+year, +month - 1, +day);
+			const user_id = user.uid;
 
 			await updateDoc(doc(db, user_id, editExpenseData[0].id), {
 				name,
 				type,
 				value,
-				date: dataObj,
+				date: convertDateToFirestore(date),
 			});
 
 			toast.success('Despesa atualizada com sucesso');
@@ -93,14 +103,12 @@ function EditExpense({ editExpenseData }: { editExpenseData: expenseDataT[] }) {
 					Valor
 				</label>
 				<input
-					type="number"
+					type="text"
 					id="value"
 					className={`mt-1 p-2 w-full border rounded-md text-black ${
 						errors.value && 'border-red-600'
 					}`}
-					{...register('value', {
-						setValueAs: (value) => (value === '' ? undefined : Number(value)),
-					})}
+					{...register('value')}
 				/>
 				<span className="text-red-500 text-sm">{errors.value?.message}</span>
 

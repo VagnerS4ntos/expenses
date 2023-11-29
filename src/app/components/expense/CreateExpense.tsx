@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { expenseFormProps, expenseFormSchema } from '@/types/config';
 import { useExpenses, useUser } from '@/states/config';
-import { getInputDateFormat } from '@/utils/helpers';
+import { convertDateToFirestore, getInputDateFormat } from '@/utils/helpers';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '@/firebase/client';
 import { toast } from 'react-toastify';
@@ -30,16 +30,12 @@ function CreateExpense() {
 		try {
 			const user_id = user.uid;
 
-			//Formata a data para adicionar ao Firebase
-			const [year, month, day] = date.split('-');
-			const dataObj = new Date(+year, +month - 1, +day);
-
 			const expensesCollection = collection(db, user_id);
 			await addDoc(expensesCollection, {
 				name,
 				type,
-				value: Number(value),
-				date: dataObj,
+				value,
+				date: convertDateToFirestore(date),
 			});
 			toast.success('Despesa criada com sucesso');
 			setCreating(false);
@@ -85,14 +81,12 @@ function CreateExpense() {
 					Valor
 				</label>
 				<input
-					type="number"
+					type="text"
 					id="value"
 					className={`mt-1 p-2 w-full border rounded-md text-black ${
 						errors.value && 'border-red-600'
 					}`}
-					{...register('value', {
-						setValueAs: (value) => (value === '' ? undefined : Number(value)),
-					})}
+					{...register('value')}
 				/>
 				<span className="text-red-500 text-sm">{errors.value?.message}</span>
 
