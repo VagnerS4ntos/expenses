@@ -19,6 +19,7 @@ function DeleteExpense({ id }: { id: string }) {
 		try {
 			const user_id = user.uid;
 			await deleteDoc(doc(db, user_id, id));
+			toast.clearWaitingQueue();
 			toast.success('Despesa deletada com sucesso!');
 			setDeleting(false);
 		} catch (error) {

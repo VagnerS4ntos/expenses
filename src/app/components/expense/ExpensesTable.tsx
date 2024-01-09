@@ -56,9 +56,9 @@ function ExpensesTable() {
 		setSlicedExpenses(slicedExpensesData);
 
 		if (
-			slicedExpensesData.length % 10 == 0 &&
 			currentPage > 1 &&
-			currentPage * expensesPerPege != expensesByDate.length
+			currentPage * expensesPerPege ==
+				expenseRenderData.length + expensesPerPege
 		) {
 			setCurrentPage((prev) => prev - 1);
 		}

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactPaginate from 'react-paginate';
 import { MdNavigateNext } from 'react-icons/md';
 
-function Paginate({
+export function Paginate({
 	dataLength,
 	dataPerPage,
 	setCurrentPage,
@@ -16,11 +16,16 @@ function Paginate({
 	const changePage = ({ selected }: { selected: number }) => {
 		setCurrentPage(selected + 1);
 	};
-	<MdNavigateNext />;
+
 	return (
 		<ReactPaginate
 			previousLabel={'<'}
-			nextLabel={'>'}
+			nextLabel={
+				<div>
+					Próxima <MdNavigateNext />
+				</div>
+			}
+			// nextLabel={">"}
 			pageCount={pageCount}
 			onPageChange={changePage}
 			containerClassName="paginationContainer"
@@ -30,5 +35,3 @@ function Paginate({
 		/>
 	);
 }
-
-export default Paginate;
