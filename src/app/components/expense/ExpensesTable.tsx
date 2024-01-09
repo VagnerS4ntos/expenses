@@ -55,7 +55,11 @@ function ExpensesTable() {
 		const slicedExpensesData = expenseRenderData.slice(firstIndex, lastIndex);
 		setSlicedExpenses(slicedExpensesData);
 
-		if (slicedExpensesData.length % 10 == 0 && currentPage > 1) {
+		if (
+			slicedExpensesData.length % 10 == 0 &&
+			currentPage > 1 &&
+			currentPage * expensesPerPege != expensesByDate.length
+		) {
 			setCurrentPage((prev) => prev - 1);
 		}
 
