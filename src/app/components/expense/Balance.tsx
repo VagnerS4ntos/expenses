@@ -10,12 +10,12 @@ function Balance() {
 	//Soma dos valores que entraram
 	const inflows = expensesByDate
 		.filter((expense) => expense.type == 'entrada')
-		.reduce((acc, expense) => acc + Number(expense.value), 0);
+		.reduce((acc, expense) => acc + Number(expense.value.replace(',', '.')), 0);
 
 	//Soma dos valores que saíram
 	const expenses = expensesByDate
 		.filter((expense) => expense.type == 'saída')
-		.reduce((acc, expense) => acc + Number(expense.value), 0);
+		.reduce((acc, expense) => acc + Number(expense.value.replace(',', '.')), 0);
 
 	//Cálculo do saldo
 	const balance = inflows - expenses;
